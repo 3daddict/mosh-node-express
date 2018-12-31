@@ -11,4 +11,6 @@ This project was created to learn and practice setting up a Back-End from scratc
 ## What I've learned
   * Node.js http module
   * Express setting up app
-  * Express Dynamic Routes
+  * Express dynamic routes
+  * GET, POST end points
+  * Server side input validation with joi
