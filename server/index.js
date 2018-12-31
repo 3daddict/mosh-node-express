@@ -2,6 +2,9 @@
 const express = require('express');
 const app = express();
 
+//express json middleware
+app.use(express.json());
+
 const courses = [
 {
     id: 1,
@@ -28,6 +31,18 @@ app.get('/api/courses', (req, res) => {
 app.get('/api/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
     if(!course) res.status(404).send('The course with the given id was not found');
+    res.send(course);
+});
+
+app.post('/api/courses', (req, res) => {
+    //create a new course object
+    const course = {
+        id: courses.length + 1,
+        name: req.body.name
+    };
+    //push to courses array
+    courses.push(course);
+    //return object to client
     res.send(course);
 });
 
