@@ -5,6 +5,11 @@ const app = express();
 //express json middleware
 app.use(express.json());
 
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
+
 const courses = [
 {
     id: 1,
@@ -35,19 +40,12 @@ app.get('/api/courses/:id', (req, res) => {
 });
 
 app.post('/api/courses', (req, res) => {
-    //schema
-    const schema = {
-        name: Joi.string().min(3).required()
-    };
-
-    const result = Joi.validate(req.body, schema);
-
+    const { error } = validateCourse(req.body);
     //validation logic
-    if(result.error) {
-        res.status(400).send(result.error.details[0].message);
+    if(error) {
+        res.status(400).send(error.details[0].message);
         return;
     }
-
     //create a new course object
     const course = {
         id: courses.length + 1,
@@ -59,7 +57,30 @@ app.post('/api/courses', (req, res) => {
     res.send(course);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+app.put('/api/courses/:id', (req, res) => {
+    //lookup the course
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if(!course) res.status(404).send('The course with the given id was not found');
+
+    //validate
+    const { error } = validateCourse(req.body);
+    //validation logic
+    if(error) {
+        res.status(400).send(error.details[0].message);
+        return;
+    }
+
+    //update course object
+    course.name = req.body.name;
+    //return
+    res.send(course);
+
 });
+
+function validateCourse(course) {
+    const schema = {
+        name: Joi.string().min(3).required()
+    };
+
+    return Joi.validate(course, schema);
+}
